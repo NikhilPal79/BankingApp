@@ -29,7 +29,7 @@ public class BankServiceImpl implements BankService {
         if (name == null || name.isEmpty()) throw new ValidationException("Customer name is empty");
     };
 
-    private final Validation<String> validatEmail = email -> {
+    private final Validation<String> validateEmail = email -> {
         if (email == null || !email.contains("@")) throw new ValidationException("Customer email is empty");
     };
 
@@ -42,7 +42,7 @@ public class BankServiceImpl implements BankService {
     public String openAccount(String name, String email, String accountType) throws ValidationException {
 
         validateName.validate(name);
-        validatEmail.validate(email);
+        validateEmail.validate(email);
         validateType.validate(accountType);
 
         String customerId = UUID.randomUUID().toString();

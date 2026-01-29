@@ -100,16 +100,12 @@ public class Main {
         bankService.getStatement(account).forEach(t-> {
                 System.out.println(t.getTimestamp() + " | " + t.getType() + " | " + t.getAmount() + " | " + t.getNote());
         });
-
     }
 
     private static void listAccount(Scanner scanner, BankService bankService) {
         bankService.listAccounts().forEach(account -> {
             System.out.println(account.getAccountNumber() + " | " + account.getAccountType() + " | " + account.getBalance() ) ;
         });
-
-
-
     }
 
     private static void searchAccount(Scanner scanner, BankService bankService ) {
