@@ -6,9 +6,11 @@ import domain.Transaction;
 import domain.Type;
 import exceptions.AccountNotFoundException;
 import exceptions.InsufficientFundsException;
+import exceptions.ValidationException;
 import repository.AccountRepository;
 import repository.CustomerRepo;
 import repository.TransactionRepo;
+import util.Validation;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,8 +25,26 @@ public class BankServiceImpl implements BankService {
     private final TransactionRepo transactionRepo = new TransactionRepo();
     private final CustomerRepo customerRepo = new CustomerRepo();
 
+    private final Validation<String> validateName = name -> {
+        if (name == null || name.isEmpty()) throw new ValidationException("Customer name is empty");
+    };
+
+    private final Validation<String> validatEmail = email -> {
+        if (email == null || !email.contains("@")) throw new ValidationException("Customer email is empty");
+    };
+
+    private final Validation<String> validateType = type -> {
+        if (type == null || (type.equalsIgnoreCase("SAVINGS")) || type.contains("CURRENT") )
+            throw new ValidationException("Account Type should be SAVINGS or CURRENT");
+    };
+
     @Override
-    public String openAccount(String name, String email, String accountType) {
+    public String openAccount(String name, String email, String accountType) throws ValidationException {
+
+        validateName.validate(name);
+        validatEmail.validate(email);
+        validateType.validate(accountType);
+
         String customerId = UUID.randomUUID().toString();
         // CHANGE LATER
         /*String accountNumber = UUID.randomUUID().toString();*/
@@ -102,11 +122,6 @@ public class BankServiceImpl implements BankService {
             Transaction totransaction = new Transaction(to.getAccountNumber(),
                     amount, UUID.randomUUID().toString(), note, LocalDateTime.now(), Type.TRANSFER_IN);
             transactionRepo.add(totransaction);
-
-
-
-
-
 
         }
 

@@ -1,13 +1,15 @@
 package app;
 
 import domain.Customer;
+import exceptions.AccountNotFoundException;
+import exceptions.ValidationException;
 import service.BankService;
 import service.BankServiceImpl;
 
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws AccountNotFoundException, ValidationException {
         Scanner scanner = new Scanner(System.in);
 
         BankService bankService = new BankServiceImpl();
@@ -44,7 +46,7 @@ public class Main {
             }
         }
 
-    private static void openAccount(Scanner scanner, BankService bankService) {
+    private static void openAccount(Scanner scanner, BankService bankService) throws AccountNotFoundException, ValidationException {
         System.out.println("Customer Name: ");
         String name =  scanner.nextLine().trim();
         System.out.println("Customer Email: ");
@@ -62,7 +64,7 @@ public class Main {
 
     }
 
-    private static void deposit(Scanner scanner, BankService bankService) {
+    private static void deposit(Scanner scanner, BankService bankService) throws AccountNotFoundException {
         System.out.println("Account Number: ");
         String accountNumber = scanner.nextLine().trim();
         System.out.println("Amount: ");
@@ -71,7 +73,7 @@ public class Main {
         System.out.println(" You have Deposited: " + amount + " to "  + accountNumber) ;
     }
 
-    private static void withdraw(Scanner scanner, BankService bankService) {
+    private static void withdraw(Scanner scanner, BankService bankService) throws AccountNotFoundException {
         System.out.println("Account Number: ");
         String accountNumber = scanner.nextLine().trim();;
         System.out.println("Amount: ");
@@ -80,7 +82,7 @@ public class Main {
         System.out.println(" You have Withdrawn: " + amount + " from " +  accountNumber);
     }
 
-    private static void transfer(Scanner scanner, BankService bankService) {
+    private static void transfer(Scanner scanner, BankService bankService) throws AccountNotFoundException {
         System.out.println("From Account: ");
         String fromAccount = scanner.nextLine().trim();
         System.out.println("To Account: ");
