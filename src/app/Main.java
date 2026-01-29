@@ -1,5 +1,6 @@
 package app;
 
+import domain.Customer;
 import service.BankService;
 import service.BankServiceImpl;
 
@@ -31,11 +32,11 @@ public class Main {
             switch (choice) {
                 case "1" -> openAccount(scanner, bankService);
                 case "2" -> deposit(scanner, bankService);
-                case "3" -> withdraw(scanner);
-                case "4" -> transfer(scanner);
-                case "5" -> accountStatement(scanner);
+                case "3" -> withdraw(scanner, bankService);
+                case "4" -> transfer(scanner, bankService);
+                case "5" -> accountStatement(scanner, bankService);
                 case "6" -> listAccount(scanner, bankService);
-                case "7" -> searchAccount(scanner);
+                case "7" -> searchAccount(scanner, bankService);
                 case "0" ->  running = false;
                 }
 
@@ -54,7 +55,10 @@ public class Main {
         String amountStr =  scanner.nextLine().trim();
         Double initialDeposit = Double.valueOf(amountStr);
         String accountNumber = bankService.openAccount(name, email, type);
-        System.out.println( name + "has opened the " +  accountNumber  );
+
+        if (initialDeposit > 0)
+            bankService.deposit(accountNumber,initialDeposit,"Initial Deposit");
+        System.out.println( name + " has opened the " +  accountNumber  );
 
     }
 
@@ -64,16 +68,37 @@ public class Main {
         System.out.println("Amount: ");
         Double amount = Double.valueOf(scanner.nextLine().trim());
         bankService.deposit(accountNumber,amount,"Deposit");
-        System.out.println("Deposited: ");
+        System.out.println(" You have Deposited: " + amount + " to "  + accountNumber) ;
     }
 
-    private static void withdraw(Scanner scanner) {
+    private static void withdraw(Scanner scanner, BankService bankService) {
+        System.out.println("Account Number: ");
+        String accountNumber = scanner.nextLine().trim();;
+        System.out.println("Amount: ");
+        Double amount = Double.valueOf(scanner.nextLine().trim());
+        bankService.withdraw(accountNumber,amount," Withdrawn ");
+        System.out.println(" You have Withdrawn: " + amount + " from " +  accountNumber);
     }
 
-    private static void transfer(Scanner scanner) {
+    private static void transfer(Scanner scanner, BankService bankService) {
+        System.out.println("From Account: ");
+        String fromAccount = scanner.nextLine().trim();
+        System.out.println("To Account: ");
+        String toAccount = scanner.nextLine().trim();
+        System.out.println("Amount: ");
+        Double amount = Double.valueOf(scanner.nextLine().trim());
+        bankService.transfer(fromAccount,toAccount,amount,"Transfer");
+        System.out.println(" You have transferred: " + amount + " from " + fromAccount + " to "  + toAccount);
+
     }
 
-    private static void accountStatement(Scanner scanner) {
+    private static void accountStatement(Scanner scanner, BankService bankService) {
+        System.out.println("Account Number: ");
+        String account = scanner.nextLine().trim();
+        bankService.getStatement(account).forEach(t-> {
+                System.out.println(t.getTimestamp() + " | " + t.getType() + " | " + t.getAmount() + " | " + t.getNote());
+        });
+
     }
 
     private static void listAccount(Scanner scanner, BankService bankService) {
@@ -85,6 +110,10 @@ public class Main {
 
     }
 
-    private static void searchAccount(Scanner scanner) {
+    private static void searchAccount(Scanner scanner, BankService bankService ) {
+        System.out.println("Customer Name: ");
+        String query = scanner.nextLine().trim();
+        bankService.searchAccountByCustomerName(query).forEach(account ->
+                System.out.println(account.getAccountNumber() + " | " +  account.getAccountType() + " | " +  account.getBalance() ));
     }
 }
