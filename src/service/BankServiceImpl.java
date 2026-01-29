@@ -4,6 +4,8 @@ import domain.Account;
 import domain.Customer;
 import domain.Transaction;
 import domain.Type;
+import exceptions.AccountNotFoundException;
+import exceptions.InsufficientFundsException;
 import repository.AccountRepository;
 import repository.CustomerRepo;
 import repository.TransactionRepo;
@@ -51,9 +53,9 @@ public class BankServiceImpl implements BankService {
     }
 
     @Override
-    public void deposit(String accountNumber, Double amount, String note) {
+    public void deposit(String accountNumber, Double amount, String note) throws AccountNotFoundException {
         Account account = accountRepository.findByNumber(accountNumber)
-                        .orElseThrow(()-> new RuntimeException(" Account not found: " + accountNumber));
+                        .orElseThrow(()-> new AccountNotFoundException(" Account not found: " + accountNumber));
         account.setBalance(account.getBalance() + amount);
         Transaction transaction = new Transaction(account.getAccountNumber(),amount, UUID.randomUUID().toString(), note, LocalDateTime.now(), Type.DEPOSIT);
         transactionRepo.add(transaction);
@@ -61,11 +63,11 @@ public class BankServiceImpl implements BankService {
     }
 
     @Override
-    public void withdraw(String accountNumber, Double amount, String note) {
+    public void withdraw(String accountNumber, Double amount, String note) throws AccountNotFoundException {
         Account account = accountRepository.findByNumber(accountNumber)
-                .orElseThrow(()-> new RuntimeException(" Account not found: " + accountNumber));
+                .orElseThrow(()-> new AccountNotFoundException(" Account not found: " + accountNumber));
         if ( account.getBalance().compareTo(amount) < 0 ) {
-            throw new  RuntimeException(" Insufficient Balance ");
+            throw new InsufficientFundsException(" Insufficient Balance ");
         }
         account.setBalance(account.getBalance() - amount);
         Transaction transaction = new Transaction(account.getAccountNumber(),amount, UUID.randomUUID().toString(), note, LocalDateTime.now(), Type.WITHDRAW);
@@ -75,19 +77,19 @@ public class BankServiceImpl implements BankService {
 
 
     @Override
-    public void transfer(String fromAccount, String toAccount, Double amount, String note) {
+    public void transfer(String fromAccount, String toAccount, Double amount, String note) throws AccountNotFoundException{
         if (fromAccount.equals(toAccount)) {
             throw new RuntimeException("Cant transfer to you account");
         }
         Account from = accountRepository.findByNumber(fromAccount)
-                    .orElseThrow(() -> new RuntimeException(" Account not found: " + fromAccount));
+                    .orElseThrow(() -> new AccountNotFoundException(" Account not found: " + fromAccount));
 
 
         Account to = accountRepository.findByNumber(toAccount)
-                    .orElseThrow(() -> new RuntimeException(" Account not found: " + toAccount));
+                    .orElseThrow(() -> new AccountNotFoundException(" Account not found: " + toAccount));
 
         if (from.getBalance().compareTo(amount) < 0) {
-            throw new RuntimeException(" Insufficient Balance ");
+            throw new InsufficientFundsException(" Insufficient Balance ");
         }
 
             from.setBalance(from.getBalance() - amount);
